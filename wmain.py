@@ -1,6 +1,9 @@
 from wlogic import *
 
 def main():
+    """"
+    Create the application, open the main window, and run's the program. 
+    """""
     application = QApplication([])
     window = Logic()
     window.show()

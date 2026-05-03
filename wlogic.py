@@ -3,7 +3,9 @@ from PyQt6.QtWidgets import *
 from wgui import *
 
 class Logic(QMainWindow, Ui_MainWindow):
-    def __init__(self):
+    """ Main application window that controls the screen navigation and user actions."""
+    def __init__(self) -> None:
+        """Initialize the main window, set up the UI, and connect button signals."""
         super().__init__()
         self.setupUi(self)
         self.stackedWid.setCurrentWidget(self.page_main)
@@ -31,28 +33,34 @@ class Logic(QMainWindow, Ui_MainWindow):
 
         #FF Map Section
         self.ff_map_confirm_btn.clicked.connect(lambda: self.ff_display_map(confirm =True))
-        ff_mapcheckboxes = [self.ff_map_rm_164_CB, self.ff_map_rm_161_CB, self.ff_map_rm_160_CB,
+        ff_map_checkboxes = [self.ff_map_rm_164_CB, self.ff_map_rm_161_CB, self.ff_map_rm_160_CB,
             self.ff_map_rm_157_CB, self.ff_map_rm_155_CB, self.ff_map_rm_153_CB,
             self.ff_map_fish_bowl_CB, self.ff_map_rm_IST_Office_CB, self.ff_map_rm_Eng_Office_CB,
             self.ff_map_rm_Dean_Office_CB, self.ff_map_rm_Cafe_CB, self.ff_map_additional_lounge_CB,
             self.ff_map_triangle_lounge_CB, self.ff_map_Cafe_lounge_CB
                 ]
-        for ff_checkbox in ff_mapcheckboxes:
+        for ff_checkbox in ff_map_checkboxes:
             ff_checkbox.toggled.connect(self.ff_map_display_selection)
         self.map_scrn_display_btn.clicked.connect(lambda: self.stackedWid.setCurrentWidget(self.from_map_to_image_display()))
 
-    def ms_start_button(self):
+    def ms_start_button(self) -> None:
+        """Switch from the main screen to the floor selection screen."""
         self.stackedWid.setCurrentWidget(self.page_choose)
 
-    def display_home_scrn(self):
+    def display_home_scrn(self) -> None:
+        """Display the home screen."""
         self.stackedWid.setCurrentWidget(self.page_main)
 
-    def display_ff_scrn(self):
+    def display_ff_scrn(self) -> None:
+        """Display the first-floor screen."""
         self.stackedWid.setCurrentWidget(self.page_ff)
-    def ff_returnscreen(self):
+
+    def ff_returnscreen(self) -> None:
+        """Return from the first-floor screen to the home screen."""
         self.stackedWid.setCurrentWidget(self.page_main)
 
-    def ff_handle_dropdown_option(self):
+    def ff_handle_dropdown_option(self) -> None:
+        """Show rooms choices based on the first-floor category selected by the user."""
         available_options = ["Classroom", "Bathroom", "Lounges", "Office/Faculty", "Cafe"]
         chosen_option = self.ff_choose_room_drpdwn.currentText().strip() # added strip
         if chosen_option in available_options:
@@ -72,18 +80,18 @@ class Logic(QMainWindow, Ui_MainWindow):
         else:
             self.ff_specific_room_drpdwn.setVisible(False)
             self.ff_continue_btn.setVisible(False)
-            QMessageBox.information(self, "Error", f"You have selected nothing.")
+            QMessageBox.information(self, "Error", "You have selected nothing.")
 
-    def ff_handle_output_desire_floor(self):
+    def ff_handle_output_desire_floor(self) -> None:
+        """Display the selected room image and pathway image for the chosen first-floor location."""
         selected_room = self.ff_specific_room_drpdwn.currentText()
-
 
         pathway_photo = None
         if selected_room == "153":
             photo_path = r"R153.JPG"
         elif selected_room == "157":
             photo_path = r"R157.JPG"
-        #Ofiice/Faculty Section
+        # Office/Faculty Section
         elif selected_room == "IS&T Department":
             pathway_photo = r"FF To Office.jpeg"
             photo_path = r"FF IST Office.JPG"
@@ -118,7 +126,8 @@ class Logic(QMainWindow, Ui_MainWindow):
             print(f"File not found: {photo_path}")
         self.stackedWid.setCurrentWidget(self.page_image)
 
-    def ff_display_map(self, confirm=False):
+    def ff_display_map(self, confirm=False) -> None:
+        """Display the first-floor map and show matching room markers based on the selected category."""
         self.stackedWid.setCurrentWidget(self.page_ff_map)
 
         ff_checkboxes = [
@@ -129,11 +138,11 @@ class Logic(QMainWindow, Ui_MainWindow):
             self.ff_map_triangle_lounge_CB, self.ff_map_Cafe_lounge_CB
         ]
         if not confirm:
-            for cb in ff_checkboxes:
-                cb.setVisible(True)
+            for checkbox in ff_checkboxes:
+                checkbox.setVisible(True)
             return
-        for cb in ff_checkboxes:
-            cb.setVisible(False)
+        for checkbox in ff_checkboxes:
+            checkbox.setVisible(False)
 
 
         grouped_cbs = {
@@ -151,24 +160,25 @@ class Logic(QMainWindow, Ui_MainWindow):
 
 
         if self.ff_map_drpdwn.currentIndex() == 0:
-            QMessageBox.information(self, "Info", f"Select valid opt.")
-            for cb in ff_checkboxes:
-                cb.setVisible(True)
-                cb.setChecked(False)
+            QMessageBox.information(self, "Info", "Select valid opt.")
+            for checkbox in ff_checkboxes:
+                checkbox.setVisible(True)
+                checkbox.setChecked(False)
             return
 
 
-        options = self.ff_map_drpdwn.currentText().strip()
-        QMessageBox.information(self, "Recognized Option", f"The option you chose is {options}")
-        if options in grouped_cbs:
-            for cbs in grouped_cbs[options]:
-                cbs.setVisible(True)
+        selected_option = self.ff_map_drpdwn.currentText().strip()
+        QMessageBox.information(self, "Recognized Option", f"The option you chose is {selected_option}")
+        if selected_option in grouped_cbs:
+            for checkbox in grouped_cbs[selected_option]:
+                checkbox.setVisible(True)
         else:
-            QMessageBox.information(self, "Info", f"Invalid selection: {options}")
+            QMessageBox.information(self, "Info", f"Invalid selection: {selected_option}")
 
-    def ff_map_display_selection(self, checked):
+    def ff_map_display_selection(self, checked) -> None:
+        """Display the selected room name when a first-floor map checkbox is checked."""
         if checked:
-            cbs = self.sender()
+            selected_checkbox = self.sender()
             room_names = {
                 self.ff_map_rm_153_CB: "153",
                 self.ff_map_rm_155_CB: "155",
@@ -185,16 +195,19 @@ class Logic(QMainWindow, Ui_MainWindow):
                 self.ff_map_triangle_lounge_CB: "Middle Lounge",
                 self.ff_map_Cafe_lounge_CB: "Cafe Lounge",
             }
-            room_chosen = room_names.get(cbs, "Unknown Room")
-            QMessageBox.information(self, "Location Selected", f"You have selected : {room_chosen}")
+            room_chosen = room_names.get(selected_checkbox, "Unknown Room")
+            QMessageBox.information(self, "Location Selected", f"You have selected: {room_chosen}")
 
-    def from_map_to_image_display(self):
+    def from_map_to_image_display(self) -> None:
+        """Switch from the map screen to the image display screen."""
         self.stackedWid.setCurrentWidget(self.page_image)
 
-    def display_scrn_sf(self):
+    def display_scrn_sf(self) -> None:
+        """Show a message when the second-floor button is pressed."""
         display_message = "You pressed 2nd Floor button"
         QMessageBox.information(self, "Info", display_message)
 
-    def display_scrn_tf(self):
+    def display_scrn_tf(self) -> None:
+        """Show a message when the third-floor button is pressed."""
         display_message = "You pressed 3rd Floor button"
         QMessageBox.information(self, "Info", display_message)
